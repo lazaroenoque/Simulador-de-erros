@@ -1,16 +1,205 @@
-{
-    "configurations": [
-        {
-            "name": "Win32",
-            "includePath": [
-                "${workspaceFolder}/**"
-            ],
-            "defines": [
-                "_DEBUG",
-                "UNICODE",
-                "_UNICODE"
-            ]
+#include <stdio.h>
+#include <math.h> // Para funções matemáticas como: fabs, pow, round, trunc
+#include <stdlib.h> // Para system("clear") ou system("cls")
+
+// Uma pequena tolerância para comparação com zero em ponto flutuante
+#define ZERO_TOLERANCE 1e-9
+
+// Função para limpar o buffer de entrada e evitar loops infinitos com scanf
+void limpar_buffer_entrada() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
+
+int main() {
+    int opcao_principal;
+    char continuar = 's';
+
+    while (continuar == 's' || continuar == 'S') {
+        // Opcional: Limpa a tela para uma melhor experiência de usuário
+        // system("cls"); // Para Windows
+        // system("clear"); // Para Linux/macOS
+        
+        printf("=== MENU PRINCIPAL ===\n");
+        printf("1 - Somas sucessivas (erro por truncamento)\n");
+        printf("2 - Calculadora simples\n");
+        printf("Escolha uma opcao: ");
+        
+        // Validação da entrada do menu
+        if (scanf("%d", &opcao_principal) != 1) {
+            printf("\nEntrada invalida! Por favor, digite um numero.\n\n");
+            limpar_buffer_entrada(); // Limpa a entrada incorreta
+            continue; // Pula para a próxima iteração do loop
         }
-    ],
-    "version": 4
+        limpar_buffer_entrada(); // Limpa o '\n' deixado pelo scanf
+
+        // ============================================
+        // ----------- SOMAS SUCESSIVAS ---------------
+        // ============================================
+        if (opcao_principal == 1) {
+            int n;
+            double valor; // Usando double para maior precisão
+
+            printf("\n--- SOMAS SUCESSIVAS ---\n");
+            printf("Digite o valor a ser somado: ");
+            scanf("%lf", &valor);
+            printf("Digite o numero de somas (n): ");
+            scanf("%d", &n);
+            double soma_trunc = 2*valor;
+            limpar_buffer_entrada(); // Limpeza de buffer por segurança
+
+            // Loop 'for' é mais idiomático para um número fixo de iterações
+            for (int k = 0; k < n-2; k++) {
+                // Esta linha trunca a soma ACUMULADA antes de adicionar o próximo valor.
+                soma_trunc = valor + trunc(soma_trunc * 10000.0) / 10000.0;
+            }
+            
+            double fator_exibicao = 10000.0; //fator para um truncamento com 4 casas decimais
+            double soma_trunc_exibicao = trunc(soma_trunc * fator_exibicao) / fator_exibicao; //trunca o resultado antes da exibição
+
+            double soma_exata = (double)n * valor;
+            double erro_abs = fabs(soma_exata - soma_trunc_exibicao); //fabs é usado para se ter o módulo do número
+            double erro_rel = 0.0;
+
+            if (fabs(soma_exata) > ZERO_TOLERANCE) { 
+                erro_rel = erro_abs / fabs(soma_trunc_exibicao); //cálculo do erro relativo
+                
+            }
+
+            printf("\nSoma truncada: %.10f\n", soma_trunc_exibicao); //exibe o resultado truncado
+            printf("Soma exata:    %.10f\n", soma_exata); //exibe o resultado exato
+            printf("Erro absoluto: %.15f\n", erro_abs); //exibe o erro absoluto
+            printf("Erro relativo: %.15f\n\n", erro_rel); //exibe o erro relativo
+        }
+
+        // ============================================
+        // ----------- CALCULADORA SIMPLES ------------
+        // ============================================
+        else if (opcao_principal == 2) {
+            double num1, num2, resultado, resultado_exato; // Usando double para maior precisão
+            char operacao; //variável que armazena o tipo de operação fornecida pelo usuário
+            int casas_arredondar_entrada, casas_exibicao, modo;
+            char arredondar_entradas;
+
+            //exibe o menu da calculadora
+            printf("\n--- CALCULADORA SIMPLES ---\n");
+            printf("Operacoes disponiveis: +  -  * /\n\n");
+
+            printf("Digite o primeiro numero: "); //solicita o primeiro número ao usuário
+            scanf("%lf", &num1); // armazena o valor fornecido pelo usuário
+
+            printf("Digite a operacao: "); //solicita a operação matemática
+            scanf(" %c", &operacao); //armazena a operação
+
+            printf("Digite o segundo numero: "); //solicita o segundo número ao usuário
+            scanf("%lf", &num2); // armazena o valor fornecido pelo usuário
+            limpar_buffer_entrada(); // Limpeza de buffer
+
+            // --- Etapa 1: Calcular o resultado exato ANTES de qualquer modificação
+            switch (operacao) {
+                case '+': resultado_exato = num1 + num2; break;
+                case '-': resultado_exato = num1 - num2; break; //esse switch garante que o valor mais exato...
+                case '*': resultado_exato = num1 * num2; break; //... não seja perdido após o arredondamento
+                case '/':
+                    if (fabs(num2) < ZERO_TOLERANCE) { // Verificação mais segura para ponto flutuante
+                        printf("Erro: divisao por zero!\n\n");
+                        continue;
+                    }
+                    resultado_exato = num1 / num2;
+                    break;
+                default:
+                    printf("Operacao invalida!\n\n");
+                    continue;
+            }
+
+            // --- Etapa 2: Perguntar e, se necessário, arredondar os valores de ENTRADA
+            printf("\nDeseja arredondar os valores inseridos ANTES da operacao? (s/n): ");
+            scanf(" %c", &arredondar_entradas);
+            limpar_buffer_entrada();
+            
+            //verifica se o usuário deseja arredondar os valores ou não
+            if (arredondar_entradas == 's' || arredondar_entradas == 'S') {
+                printf("Digite o numero de casas decimais para arredondar as entradas: ");
+                scanf("%d", &casas_arredondar_entrada);
+                limpar_buffer_entrada();
+                
+                
+                //fator de escala para o arredondamento desejado pelo usuário
+                double fator_entrada = pow(10, casas_arredondar_entrada);
+                num1 = round(num1 * fator_entrada) / fator_entrada;
+                num2 = round(num2 * fator_entrada) / fator_entrada;
+
+                printf("\nValores arredondados antes da operacao:\n");
+                printf("num1 = %.*f\n", casas_arredondar_entrada, num1);
+                printf("num2 = %.*f\n", casas_arredondar_entrada, num2);
+            }
+
+            // --- Etapa 3: Calcular o resultado com os valores possivelmente modificados (evitando duplicar código)
+            switch (operacao) {
+                case '+': resultado = num1 + num2; break;
+                case '-': resultado = num1 - num2; break;
+                case '*': resultado = num1 * num2; break;
+                case '/': resultado = num1 / num2; break;
+            }
+
+            // --- Etapa 4: Configurar e exibir o resultado final
+            printf("\nDigite o numero de casas decimais para EXIBIR o resultado: ");
+            scanf("%d", &casas_exibicao);
+            
+            //pergunta oo usuário a escolher o entre "arredondamento" e "truncamento"
+            printf("Escolha o modo de exibicao:\n");
+            printf("1 - Arredondar\n");
+            printf("2 - Truncar\n");
+            printf("Opcao: ");
+            scanf("%d", &modo);
+            limpar_buffer_entrada();
+
+            double resultado_final;
+            double erro_abs = 0.0, erro_rel = 0.0;
+            
+            printf("\n------------------------------------\n");
+            printf("Resultado Exato (precisao maxima): %.15f\n", resultado_exato); //imprime o resultado mais exato possível
+            
+            //estrutura de decisão que exibe os resultado de acordo as escolhas do usuário
+            if (modo == 1) {
+                double fator_exibicao = pow(10, casas_exibicao);
+                resultado_final = round(resultado * fator_exibicao) / fator_exibicao;
+                printf("Resultado Arredondado (%d casas): %.*f\n", casas_exibicao, casas_exibicao, resultado_final);
+            } else if (modo == 2) {
+                double fator_exibicao = pow(10, casas_exibicao);
+                resultado_final = trunc(resultado * fator_exibicao) / fator_exibicao;
+                printf("Resultado Truncado (%d casas): %.*f\n", casas_exibicao, casas_exibicao, resultado_final);
+            } else {
+                printf("Opcao de modo invalida! Exibindo valor sem tratamento final.\n");
+                resultado_final = resultado; // Atribui o resultado calculado para o cálculo do erro
+                printf("Resultado Calculado: %.15f\n", resultado_final);
+            }
+
+            erro_abs = fabs(resultado_exato - resultado_final);
+            if (fabs(resultado_exato) > ZERO_TOLERANCE) { 
+                erro_rel = erro_abs / fabs(resultado_final);
+            }
+            
+            //exibição dos erros
+            printf("Erro Absoluto: %.15f\n", erro_abs);
+            printf("Erro Relativo: %.15f\n", erro_rel);
+            printf("------------------------------------\n\n");
+
+        }
+        // ============================================
+        // ----------- OPÇÃO INVÁLIDA -----------------
+        // ============================================
+        else {
+            printf("\nOpcao invalida!\n\n");
+        }
+
+        // Pergunta se o usuário quer repetir
+        printf("Deseja realizar outra operacao? (s/n): ");
+        scanf(" %c", &continuar);
+        limpar_buffer_entrada();
+        printf("\n");
+    }
+
+    printf("Encerrando programa...\n");
+    return 0;
 }
