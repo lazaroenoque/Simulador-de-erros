@@ -5,12 +5,12 @@
 int main() {
 	
 	setlocale(LC_ALL, "Portuguese"); 
-	//vari·veis globais
+	//vari√°veis globais
 	
-    double a[3][3], b[3]; //matriz dos coefientes das vari·veis
-    double x[3], x_old[3]; //x[3] È vetor soluÁ„o atual (k); x_old[3] È o vetor anterior anterior (k-1)
-    double D,N,dR,prec; //dR È a dist„ncia relativa; prec È a precis„o do resultado 
-    int maxIter; //n˙mero m·ximo de iteraÁıes
+    double a[3][3], b[3]; //matriz dos coefientes das vari√°veis
+    double x[3], x_old[3]; //x[3] √© vetor solu√ß√£o atual (k); x_old[3] √© o vetor anterior anterior (k-1)
+    double D,N,dR,prec; //dR √© a dist√£ncia relativa; prec √© a precis√£o do resultado 
+    int maxIter; //n√∫mero m√°ximo de itera√ß√µes
     char cont = 's';
     
 
@@ -18,7 +18,7 @@ int main() {
 //Permite a entrada de novos dados
 while(cont == 's' || cont == 'S'){
 
-    // Entrada dos coeficientes das vari·veis do sistema
+    // Entrada dos coeficientes das vari√°veis do sistema
     printf("Digite os coeficientes da matriz A (3x3):\n");
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
@@ -38,25 +38,25 @@ while(cont == 's' || cont == 'S'){
         
     }
     
-    //solicita o n˙mero de iteraÁıes desejdas pelo usu·rio
+    //solicita o n√∫mero de itera√ß√µes desejdas pelo usu√°rio
     printf("\nDigite o numero maximo de iteracoes: ");
-    scanf("%d",&maxIter); //coleta o n˙mero de iteraÁıes
+    scanf("%d",&maxIter); //coleta o n√∫mero de itera√ß√µes
     
-    //solicita o a precis„o em formato percentual
-    printf("\nDidite precis„o em formato percentual (Ex.: 10%%): ");
-    scanf("%lf",&prec); //coleta a precis„o
+    //solicita o a precis√£o em formato percentual
+    printf("\nDidite precis√£o em formato percentual (Ex.: 10%%): ");
+    scanf("%lf",&prec); //coleta a precis√£o
     
     
-    //MÈtodo de Gauss-Seidel
+    //M√©todo de Gauss-Seidel
 	for(int iter = 0; iter<maxIter; iter++){
 		
 		
-	    //garante a existÍncia do vetor soluÁ„o anterior (k-1) para a comparaÁ„o no c·lculo da dR
+	    //garante a exist√™ncia do vetor solu√ß√£o anterior (k-1) para a compara√ß√£o no c√°lculo da dR
 		for( int k = 0; k < 3;k++){
 			x_old[k] = x[k];
 		}
 		
-		//atualizaÁ„o do vetor soluÁ„o
+		//atualiza√ß√£o do vetor solu√ß√£o
 		
 		x[0] = (1/a[0][0])*(b[0]-a[0][1]*x[1]-a[0][2]*x[2]);
 		
@@ -64,24 +64,24 @@ while(cont == 's' || cont == 'S'){
 		
 		x[2] = (1/a[2][2])*(b[2]-a[0][2]*x[0]-a[2][1]*x[1]);
 		
-		 //coleta do valor m·ximo em mÛdulo de (x[3] - x_old[3]) 
+		 //coleta do valor m√°ximo em m√≥dulo de (x[3] - x_old[3]) 
 	           N = fmax(fmax(fabs(x[0]-x_old[0]),  
                                 fabs(x[1]-x_old[1])),
                                 fabs(x[2]-x_old[2]));
                                 
-         //coleta do valor m·ximo em mÛdulo de x[3]                        
+         //coleta do valor m√°ximo em m√≥dulo de x[3]                        
                D = fmax(fmax(fabs(x[0]),
                             fabs(x[1])),
                             fabs(x[2]));
 		
-		 //C·lculo da dist„ncia relativa						
+		 //C√°lculo da dist√£ncia relativa						
 			 dR = N/D;
 			 
-		 //condiÁ„o de parada em caso de convergÍncia	       
+		 //condi√ß√£o de parada em caso de converg√™ncia	       
 		if(dR < (prec/100)){
 			printf("\nO sistema convergiu apos %d iteracoes.\n",iter);
-			//exibiÁ„o do resultado
-			printf("\nSoluÁ„o aproximada:\n");
+			//exibi√ß√£o do resultado
+			printf("\nSolu√ß√£o aproximada:\n");
             printf("I6 = %.3lf mA\n", x[0]*1000.0);
             printf("I2 = %.3lf mA\n", x[1]*1000.0);
             printf("I3 = %.3lf mA\n", x[2]*1000.0);
@@ -91,12 +91,12 @@ while(cont == 's' || cont == 'S'){
 
 		
 	}
-	//Exibe uma mensagem caso o sistema n„o convergir
+	//Exibe uma mensagem caso o sistema n√£o convergir
 	if(dR >= (prec/100)){
-		printf("\nO sistema nao convergiu apÛs %d iteracoes.\n", maxIter);
+		printf("\nO sistema nao convergiu ap√≥s %d iteracoes.\n", maxIter);
 	}
 
-//pergunta ao usu·rio se o mesmo n„o deseja resolver um novo sistema
+//pergunta ao usu√°rio se o mesmo n√£o deseja resolver um novo sistema
 printf("\nDeseja resolver um novo sistema? (s/S ou n/N): ");
 scanf("%s", &cont);
 printf("\n");
